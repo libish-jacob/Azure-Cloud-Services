@@ -22,6 +22,10 @@ namespace RedisCacheDemo
     /// </summary>
     public partial class MainWindow : Window
     {
+        // cache key is the primary access key
+        static string cacheKey = "eoc0Jb9txoM+E0KCwMOYAcxNEvMt0ZKEsDxrr7x2bVI=";
+        static string hostName = "libish-cache.redis.cache.windows.net";
+
         public class Test
         {
             public Test(int id, string name)
@@ -40,14 +44,16 @@ namespace RedisCacheDemo
             InitializeComponent();
         }
 
+        private Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
+        {
+            return ConnectionMultiplexer.Connect($"{hostName},abortConnect=false,ssl=true,password={cacheKey}");
+        });
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             // here we are using an ssl connection. make sure the ssl port used by cache 6380 is open or not.
 
-            // cache key is the primary access key
-            string cacheKey = "eoc0Jb9txoM+E0KCwMOYAcxNEvMt0ZKEsDxrr7x2bVI=";
-            string hostName = "libish-cache.redis.cache.windows.net";
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect($"{hostName},abortConnect=false,ssl=true,password={cacheKey}");
+            ConnectionMultiplexer connection = lazyConnection.Value;
             var cache = connection.GetDatabase();
 
             var isConnected = cache.IsConnected(cacheKey);

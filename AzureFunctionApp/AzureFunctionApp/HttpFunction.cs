@@ -1,7 +1,9 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AzureFunctionApp.Entity;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
@@ -26,9 +28,16 @@ namespace AzureFunctionApp
             // Set name to query string or body data
             name = name ?? data?.name;
 
+            ReplyEntity replyOb = new ReplyEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test",
+                Value = "Value result"
+            };
+
             return name == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a name on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, "Hello " + name);
+                : req.CreateResponse(HttpStatusCode.OK, replyOb);
         }
     }
 }
